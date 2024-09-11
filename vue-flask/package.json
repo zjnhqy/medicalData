@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "start:backend": "cd .venv/Scripts && activate && cd ../../backend && flask run --debug",
+    "start:glance_edit": "cd glance_edit && SET NODE_OPTIONS=--openssl-legacy-provider && npm run dev",
+    "start:Orthanc_Server": "cd ../../Orthanc Server && .\\Orthanc ./Configuration.json",
+    "start": "npm-run-all --parallel  start:glance_edit   start:Orthanc_Server start:backend   "
+  },
+  "dependencies": {
+    "element-ui": "^2.15.14"
+  }
+}

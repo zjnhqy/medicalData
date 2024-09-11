@@ -1,0 +1,25 @@
+.dragBox {
+  border: 1px dashed gray;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dragBox:hover,
+.dropTarget {
+  background: rgba(0, 0, 0, 0.09);
+}
+
+.button-container {
+  display: flex;
+}
+
+/* 如果要将按钮间的间距均匀分配，可以添加以下 CSS */
+.button-container>* {
+  margin-right: 10px;
+  /* 或者其他你想要的间距 */
+}
+
+/* 如果你希望按钮的大小相等，可以设置 flex-grow 属性 */
+.button-container>* {
+  flex-grow: 1;
+}

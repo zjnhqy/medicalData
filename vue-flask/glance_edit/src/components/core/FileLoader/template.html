@@ -1,0 +1,154 @@
+<v-dialog width="70%" :value="value" :persistent="loading" :fullscreen="$vuetify.breakpoint.smAndDown"
+  @input="onDialogChange" @click:outside="!loading && close()">
+  <v-card>
+    <v-card-text class="pa-0">
+      <v-card flat>
+        <v-card-text>
+          <v-container>
+            <v-tabs v-model="active_tab">
+              <v-tab>本地上传</v-tab>
+              <v-tab @click="fetchData">文件列表</v-tab>
+              <v-tab-item transition="fade-transition">
+                <drag-and-drop>
+                  <template v-slot:default="{ dragHover }">
+                    <!-- <v-row @click="promptLocal" align="center" class="pa-3" :class="{
+                        [$style.dragBox]: true,
+                        [$style.dropTarget]: dragHover,
+                        }">
+                      <v-btn>browse</v-btn>
+                      <span class="ml-2">
+                        or drop your files here
+                      </span>
+                    </v-row> -->
+                    <el-upload class="upload-demo" drag action="http://localhost:5000/api/upload_file"
+                      :before-upload="promptLocal" :show-file-list=false multiple>
+                      <i class="el-icon-upload"></i>
+                      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                    </el-upload>
+                  </template>
+                </drag-and-drop>
+              </v-tab-item>
+              <v-tab-item transition="fade-transition">
+                <!-- <girder-box /> -->
+                <template>
+                  <div style="display: flex; flex-direction: row;">
+                    <el-input v-model="input" placeholder="使用患者姓名进行查询" style="margin-right: 10px; flex: 1;">
+                      <!-- flex设为5.25：3.25 -->
+                      <template #prepend>
+                        <!-- <el-date-picker v-model="selectedDate" type="date" placeholder="" size="small">
+                        </el-date-picker> -->
+                      </template>
+                      <template #append>
+                        <el-button link icon="el-icon-search" @click="searchFilesByName(input)" />
+                      </template>
+                    </el-input>
+                    <el-input v-model="input1" placeholder="使用患者ID进行查询" style="flex: 1;">
+                      <template #append>
+                        <el-button link icon="el-icon-search" @click="searchFilesById(input1)" />
+                      </template>
+                    </el-input>
+                  </div>
+                  <el-table :data="tableData" stripe style="width: 100%" height="250" max-height="300">
+                    <el-table-column prop="StudyDate" label="日期">
+                    </el-table-column>
+                    <el-table-column prop="PatientName" label="姓名">
+                    </el-table-column>
+                    <el-table-column prop="PatientID" label="患者ID">
+                    </el-table-column>
+                    <!-- <el-table-column prop="id" label="ID">
+                    </el-table-column> -->
+                    <el-table-column prop="StudyInstanceUID" label="StudyID" >
+                    </el-table-column>
+                    <!-- 添加标签 -->
+                    <el-table-column prop="tag" label="标签" width="100">
+                      <template slot-scope="scope">
+                        <el-tag :type="scope.row.tag === '是' ? 'primary' : 'success'"
+                          disable-transitions>{{scope.row.tag}}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" header-align="center" width="70">
+                      <template #default="scope">
+                        <div class="button-container">
+                          <el-button link icon="el-icon-circle-check" size="large" :loading="isLoading" @click=fetchDICOMFiles(scope.row)>
+                          </el-button>
+                          <!-- <el-button link icon="el-icon-download" size="large" @click=getDicomFiles(scope.row)>
+                          </el-button> -->
+<!--                          <el-button link icon="el-icon-delete" size="large" @click=deleteFile(scope.row)>-->
+<!--                          </el-button>-->
+                        </div>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </template>
+              </v-tab-item>
+            </v-tabs>
+            <v-row class="mt-2">
+              <v-expansion-panels accordion>
+                <v-expansion-panel v-for="(fileInfo, revIdx) in fileList" :key="revIdx">
+                  <v-expansion-panel-header disable-icon-rotate>
+                    <template v-slot:actions>
+                      <div class="d-flex flex-row align-center">
+                        <template v-if="fileInfo.state === 'ready'">
+                          <v-icon color="teal">mdi-check</v-icon>
+                        </template>
+                        <template v-else-if="fileInfo.state === 'error'">
+                          <v-icon color="error">mdi-alert</v-icon>
+                        </template>
+                        <template v-else-if="fileInfo.state === 'needsInfo'">
+                          <v-icon color="blue">mdi-information</v-icon>
+                        </template>
+                        <template v-else-if="fileInfo.state === 'loading' ||
+                                             fileInfo.state === 'needsDownload'">
+                          <v-progress-circular indeterminate color="secondary" size="16" width="2" />
+                        </template>
+                        <v-btn icon class="ml-3">
+                          <v-icon @click.stop="deleteFileAtRevIndex(revIdx)">mdi-delete</v-icon>
+                        </v-btn>
+                      </div>
+                    </template>
+                    <template v-slot:default="{ open }">
+                      <!-- width hack to keep row from pushing out header actions -->
+                      <v-row no-gutters style="width: 80%">
+                        <v-col cols="8">{{ fileInfo.name }}</v-col>
+                        <v-col cols="4" class="text--secondary pr-3 text-right">
+                          <span v-if="fileInfo.state === 'error'">
+                            Click to see error
+                          </span>
+                          <span v-else-if="fileInfo.ext === 'raw'">
+                            Click to edit raw file info
+                          </span>
+                          <span v-else-if="fileInfo.ext === 'glance'">
+                            State file will be loaded first
+                          </span>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <template v-if="fileInfo.state === 'error'">
+                      {{ fileInfo.error }}
+                    </template>
+                    <template v-else-if="fileInfo.ext === 'raw'">
+                      <raw-file-reader :file="fileInfo.files[0]"
+                        v-on:change="setRawFileInfoAtRevIndex(revIdx, $event)" />
+                    </template>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <span v-if="anyErrors" class="red--text mr-3">Only checked files will be loaded.</span>
+          <v-btn text :disabled="loading" @click="close">
+            取消
+          </v-btn>
+          <v-btn color="primary" :disabled="loading || pendingFiles || !hasReadyFiles" @click="loadFiles">
+            {{ loading ? '加载中' : '加载' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-card-text>
+  </v-card>
+</v-dialog>

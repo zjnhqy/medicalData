@@ -1,0 +1,5 @@
+/* globally accessible and generic utility classes */
+:global(.pv-break-word) {
+  word-break: break-word;
+}
+/* 用于设置网页中文字的展示形式（过长时进行断行） */

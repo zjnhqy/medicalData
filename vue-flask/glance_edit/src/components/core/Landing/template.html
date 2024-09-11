@@ -1,0 +1,126 @@
+<div class="black" style="background-color: #020327 !important;" :id="$style.root">
+  <v-responsive class="">
+    <v-container grid-list-lg fill-height :id="$style.banner">
+      <v-layout row align-center style="width: 100%;">
+        <v-flex :xs12="$vuetify.breakpoint.smAndDown">
+          <v-card flat dark color="transparent" style="width: 100% !important;">
+            <v-card-title class="display-1 text-center pv-break-word" style="display: flex; justify-content: center;">
+              <!-- 项目名称 -->智慧医疗
+            </v-card-title>
+            <v-card-title class="display-1 text-center pv-break-word" style="display: flex; justify-content: center;">
+              <!-- 项目名称 -->Medical Image Analysis Online
+            </v-card-title>
+            <!-- <v-card-text>
+              项目简介 -->
+            <!-- 这是一个基于web的面向智慧医疗的医疗数据自动解析系统
+            </v-card-text> -->
+            <!-- A general purpose standalone web application by
+              <a target="_blank" class="indigo--text text--lighten-3" href="https://www.kitware.com/"
+                rel="noopener noreferrer">Kitware, Inc.</a>
+              that can be used to visualize many data types.
+              It is also a great framework for building custom
+              viewers on the web which can involve remote services.-->
+            <div style="height: 30px;"></div>
+            <template>
+              <div class="typer">
+                <div class="typer-content">
+
+                  <p class="typer-static" style="display: flex; justify-content: center;">MIAO旨在：&nbsp;<span
+                      class="cut">
+                      <span class="word" v-for="(letter,index) in words" :key="index">{{letter}}</span>
+                    </span>
+                    <!-- 模拟光标-->
+                    <span class="typer-cursor"></span>
+                  </p>
+
+                </div>
+              </div>
+            </template>
+
+          </v-card>
+        </v-flex>
+        <!-- <v-flex v-if="!$vuetify.breakpoint.smAndDown" key="if-large-enough-screen" xs6 fill-height>
+          <drag-and-drop enabled :class="$style.dnd" @drop="$emit('open-files', $event)">
+            <template v-slot:default="{ dragHover }">
+              <div :class="{ [$style.fileUpload]: true, [$style.fileUploadHover]: dragHover }"
+                @click.stop="$emit('open')">
+                <div class="white--text body-2" :class="$style.fileUploadContents">
+                  <v-btn color="primary" raised="false" @click.stop="$emit('open')">
+                    <span v-if="dragHover" class="text-uppercase mr-2">拖拽文件</span>
+                    <span v-else class="text-uppercase mr-2">打开文件</span>
+                    <v-icon>mdi-folder-outline</v-icon>
+                  </v-btn>
+                  <div class="pv-no-select mt-2">
+                    或将文件拖到此处
+                  </div>
+                </div>
+              </div>
+            </template>
+          </drag-and-drop>
+        </v-flex> -->
+      </v-layout>
+    </v-container>
+  </v-responsive>
+  <v-container class="mt-4 pv-no-select" grid-list-lg>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <span class="title" style="display: flex;justify-content: center;color: aliceblue;">样例展示</span>
+      </v-flex>
+      <v-flex>
+        <el-carousel :interval="3000" type="card" height="500px" wid>
+          <el-carousel-item v-for="(sample, i) in samples" :key="i">
+            <v-card :class="$style.sampleData" flat tile>
+              <v-img :src="sample.image" height="500px" style="object-fit: cover;" />
+              <div :class="$style.linkOverlay" @click.stop="openSample(sample)">
+                <div :class="$style.linkOverlayText" class="body-2">
+                  {{ sample.label }} ({{ sample.size }})
+                  <div :class="$style.description" v-if="sample.description">
+                    {{ sample.description }}
+                  </div>
+                  <div :class="$style.acknowledgement" v-if="sample.acknowledgement">
+                    {{ sample.acknowledgement }}
+                  </div>
+                </div>
+              </div>
+            </v-card>
+          </el-carousel-item>
+        </el-carousel>
+      </v-flex>
+      <!-- <v-flex v-for="(sample, i) in samples" :key="i" :xs4="$vuetify.breakpoint.mdAndUp" :xs6="$vuetify.breakpoint.sm"
+        :xs12="$vuetify.breakpoint.xs">
+        <v-card :class="$style.sampleData" flat tile>
+          <v-img :src="sample.image" height="300px" />
+          <div :class="$style.linkOverlay" @click.stop="openSample(sample)">
+            <div :class="$style.linkOverlayText" class="body-2">
+              {{ sample.label }} ({{ sample.size }})
+              <div :class="$style.description" v-if="sample.description">
+                {{ sample.description }}
+              </div>
+              <div :class="$style.acknowledgement" v-if="sample.acknowledgement">
+                {{ sample.acknowledgement }}
+              </div>
+            </div>
+          </div>
+        </v-card>
+      </v-flex> -->
+    </v-layout>
+  </v-container>
+  <v-footer class="d-flex flex-column" height="48px" color="transparent">
+    <div class="mb-2 text-center grey--text text--darken-2">
+      <!-- 版权声明 -->
+      <div>&copy版权声明</div>
+      <!-- <div>&copy; {{ new Date().getFullYear() }} — Kitware, Inc.</div>
+      <div>Glance ({{version}})</div> -->
+    </div>
+  </v-footer>
+</div>
+<!-- <style scoped>
+  .my-color {
+    background-color: #6d4c41;
+    /* 这里使用了深棕色 */
+    color: #fff;
+    /* 文本颜色为白色，以确保对比度 */
+    padding: 20px;
+    border-radius: 8px;
+  }
+</style> -->
